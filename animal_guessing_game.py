@@ -163,7 +163,7 @@ def powerset(iterable):
    
 def find_simplest_rule(target_animal, animal_names, feature_names, feature_matrix):
     animal_index= animal_names.index(target_animal)
-    otherAnimals = [a for a in range(0,len(animal_names))]
+    otherAnimals = [a for a in range(len(animal_names))]
     otherAnimals.remove(animal_index)
     
     #loop through the powerset and try all of them until we find a rule
@@ -175,6 +175,7 @@ def find_simplest_rule(target_animal, animal_names, feature_names, feature_matri
             if all([not any([feature_matrix[animal][i] == feature_matrix[animal_index][i] for i in inds]) for animal in otherAnimals]):
                 animal_rules = {'positive_features':[],'negative_features':[]}
                 for i in inds:
+                    #build dictionary to return with features
                     if feature_matrix[animal_index][i] == 1:
                         animal_rules['positive_features'].append(feature_names[i])
                     else:
