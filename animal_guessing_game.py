@@ -2,6 +2,7 @@ import os
 import sys
 import random
 import csv
+import itertools
 """Module for working with the animal-feature dataset.
 """
 
@@ -154,5 +155,31 @@ def run(query_fn, animal_names, feature_names, feature_matrix, hyp_size, stream)
            
     return num_guesses
     
-
+def powerset(iterable):
+    #stolen from itertools documentation because my local itertools package doesn't have it for some reason
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return itertools.chain.from_iterable(itertools.combinations(s, r) for r in range(len(s)+1))
+   
+def find_simplest_rule(target_animal, animal_names, feature_names, feature_matrix):
+    animal_index= animal_names.index(target_animal)
+    otherAnimals = [a for a in range(0,len(animal_names))]
+    otherAnimals.remove(animal_index)
+    
+    #loop through the powerset and try all of them until we find a rule
+    for inds in powerset(range(len(feature_names))):
+        if inds == ():
+            pass #ignore the empty set of features
+        else:
+            #if all animals don't match any of the features of the target animal
+            if all([not any([feature_matrix[animal][i] == feature_matrix[animal_index][i] for i in inds]) for animal in otherAnimals]):
+                animal_rules = {'positive_features':[],'negative_features':[]}
+                for i in inds:
+                    if feature_matrix[animal_index][i] == 1:
+                        animal_rules['positive_features'].append(feature_names[i])
+                    else:
+                        animal_rules['negative_features'].append(feature_names[i])
+                return(animal_rules)
+    return("Yikes! We didn't find a rule!")
+    
     
